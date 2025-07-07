@@ -1,37 +1,54 @@
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get('code');
-  const state = urlParams.get('state');
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ultra Wallet PoC Callback</title>
+</head>
+<body>
+  <h1>Ultra Wallet PoC - Callback</h1>
+  <pre id="output">Processing...</pre>
 
-  const clientId = '2f6ca3c9-87ec-4042-a464-21349485a16f';
-  const redirectUri = 'https://nathanogaga118.github.io/ultra-poc/callback.html';
-  const tokenEndpoint = 'https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token';
+  <script>
+    async function exchangeCodeForToken() {
+      const codeVerifier = '47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU'; // Must match the code_challenge used with method=plain
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
 
-  // IMPORTANT: This must match the code_verifier used when generating the login URL
-  const codeVerifier = 'random123'; // this must be the original, unhashed value
+      if (!code) {
+        document.getElementById('output').textContent = '❌ No code found in URL';
+        return;
+      }
 
-  async function exchangeCode() {
-    const data = new URLSearchParams();
-    data.append('grant_type', 'authorization_code');
-    data.append('code', code);
-    data.append('client_id', clientId);
-    data.append('redirect_uri', redirectUri);
-    data.append('code_verifier', codeVerifier);
+      const tokenEndpoint = 'https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token';
 
-    try {
-      const res = await fetch(tokenEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: data
-      });
+      const body = new URLSearchParams();
+      body.append('grant_type', 'authorization_code');
+      body.append('code', code);
+      body.append('redirect_uri', 'https://nathanogaga118.github.io/ultra-poc/callback.html');
+      body.append('client_id', '2f6ca3c9-87ec-4042-a464-21349485a16f');
+      body.append('code_verifier', codeVerifier);
 
-      const result = await res.json();
-      console.log('✅ Access Token:', result.access_token);
-      console.log('✅ ID Token:', result.id_token);
-    } catch (err) {
-      console.error('❌ Token exchange failed', err);
+      try {
+        const response = await fetch(tokenEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: body.toString()
+        });
+
+        const result = await response.json();
+
+        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+
+        console.log('✅ Access Token:', result.access_token);
+        console.log('✅ ID Token:', result.id_token);
+      } catch (err) {
+        console.error('❌ Token exchange failed:', err);
+        document.getElementById('output').textContent = '❌ Token exchange failed. Check console.';
+      }
     }
-  }
 
-  exchangeCode();
-</script>
+    exchangeCodeForToken();
+  </script>
+</body>
+</html>
