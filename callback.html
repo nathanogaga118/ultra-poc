@@ -1,33 +1,37 @@
 <script>
-  async function exchangeCodeForTokens() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    const verifier = localStorage.getItem("verifier"); // get saved key
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+  const state = urlParams.get('state');
 
-    if (!code || !verifier) {
-      console.log("Missing code or verifier");
-      return;
+  const clientId = '2f6ca3c9-87ec-4042-a464-21349485a16f';
+  const redirectUri = 'https://nathanogaga118.github.io/ultra-poc/callback.html';
+  const tokenEndpoint = 'https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token';
+
+  // IMPORTANT: This must match the code_verifier used when generating the login URL
+  const codeVerifier = 'random123'; // this must be the original, unhashed value
+
+  async function exchangeCode() {
+    const data = new URLSearchParams();
+    data.append('grant_type', 'authorization_code');
+    data.append('code', code);
+    data.append('client_id', clientId);
+    data.append('redirect_uri', redirectUri);
+    data.append('code_verifier', codeVerifier);
+
+    try {
+      const res = await fetch(tokenEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: data
+      });
+
+      const result = await res.json();
+      console.log('✅ Access Token:', result.access_token);
+      console.log('✅ ID Token:', result.id_token);
+    } catch (err) {
+      console.error('❌ Token exchange failed', err);
     }
-
-    const body = new URLSearchParams({
-      grant_type: "authorization_code",
-      client_id: "2f6ca3c9-87ec-4042-a464-21349485a16f",
-      code: code,
-      redirect_uri: "https://nathanogaga118.github.io/ultra-poc/callback.html",
-      code_verifier: verifier
-    });
-
-    const res = await fetch("https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: body.toString()
-    });
-
-    const data = await res.json();
-    console.log("✅ Access Token:", data.access_token);
   }
 
-  exchangeCodeForTokens();
+  exchangeCode();
 </script>
