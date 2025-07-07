@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h2>Authorization Code Received</h2>
+    <p id="code"></p>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      document.getElementById("code").innerText = code || "No code found";
+    </script>
+  </body>
+</html>
