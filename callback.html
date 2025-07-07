@@ -1,13 +1,37 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <h2>Authorization Code Received</h2>
-    <p id="code"></p>
+<head>
+  <title>Ultra Token Callback</title>
+  <script>
+    window.onload = async function () {
+      const code = new URLSearchParams(window.location.search).get("code");
 
-    <script>
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
-      document.getElementById("code").innerText = code || "No code found";
-    </script>
-  </body>
+      if (!code) {
+        document.body.innerText = "❌ No code found in URL.";
+        return;
+      }
+
+      const tokenResponse = await fetch("https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+          grant_type: "authorization_code",
+          code: code,
+          redirect_uri: "https://nathanogaga118.github.io/ultra-poc/callback.html",
+          client_id: "2f6ca3c9-87ec-4042-a464-21349485a16f",
+          code_verifier: "r4NKTUoXD5RQChnQ4sPPhU4ZobWV1S0gFh8M7E-p3eI"  // this must match what you used before!
+        })
+      });
+
+      const data = await tokenResponse.json();
+      console.log("✅ Tokens:", data);
+      document.body.innerText = JSON.stringify(data, null, 2);
+    };
+  </script>
+</head>
+<body>
+  <h1>Loading...</h1>
+</body>
 </html>
